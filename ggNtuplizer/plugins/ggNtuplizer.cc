@@ -28,6 +28,7 @@ ggNtuplizer::ggNtuplizer(const edm::ParameterSet& ps) :
   dumpTaus_                  = ps.getParameter<bool>("dumpTaus");
   dumpPDFSystWeight_         = ps.getParameter<bool>("dumpPDFSystWeight");
   dumpHFElectrons_           = ps.getParameter<bool>("dumpHFElectrons");
+  testing_                  = ps.getParameter<bool>("testing");
   year_                      = ps.getParameter<int>("year");
 
   trgFilterDeltaPtCut_       = ps.getParameter<double>("trgFilterDeltaPtCut");
@@ -179,5 +180,6 @@ void ggNtuplizer::fillDescriptions(edm::ConfigurationDescriptions& descriptions)
 }
 //bool ggNtuplizer::UpdatedJet_secvtx() const { return (nanoUpdatedUserJetsLabel != ""); }
 bool ggNtuplizer::UpdatedJet_secvtx() const { return nanoUpdatedUserJetsLabel.label() != ""; }
+bool ggNtuplizer::testing() const { return testing_; }
 
 DEFINE_FWK_MODULE(ggNtuplizer);

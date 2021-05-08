@@ -66,6 +66,21 @@ vector<float>    phoResol_rho_dn_;
 vector<float>    phoResol_phi_up_;
 vector<float>    phoResol_phi_dn_;
 
+vector<float>    myphoE1x5_;
+vector<float>    myphoE2_;
+vector<float>    myphoE2x5_;
+vector<float>    myphoE3x3_;
+vector<float>    myphoE5x5_;
+vector<float>    myphoEmax_;
+vector<float>    myphoFull5x5_E1x5_;
+vector<float>    myphoFull5x5_E2x5_;
+vector<float>    myphoFull5x5_E3x3_;
+vector<float>    myphoFull5x5_maxEnergyXtal_;
+vector<float>    myphoFull5x5_R1x5_;
+vector<float>    myphoFull5x5_R2x5_;
+vector<float>    myphoR1x5_;
+vector<float>    myphoR2x5_;
+
 //Necessary for the Photon Footprint removal
 template <class T, class U>
 bool isInFootprint(const T& thefootprint, const U& theCandidate) {
@@ -141,6 +156,23 @@ void ggNtuplizer::branchesPhotons(TTree* tree) {
   tree->Branch("phoResol_phi_up",  &phoResol_phi_up_);
   tree->Branch("phoResol_phi_dn",  &phoResol_phi_dn_);
 
+  if ( testing() )
+  {
+     tree->Branch("phoE1x5",                  &myphoE1x5_);
+     tree->Branch("phoE2",                    &myphoE2_);
+     tree->Branch("phoE2x5",                  &myphoE2x5_);
+     tree->Branch("phoE3x3",                  &myphoE3x3_);
+     tree->Branch("phoE5x5",                  &myphoE5x5_);
+     tree->Branch("phoEmax",                  &myphoEmax_);
+     tree->Branch("phoFull5x5_E1x5",          &myphoFull5x5_E1x5_);
+     tree->Branch("phoFull5x5_E2x5",          &myphoFull5x5_E2x5_);
+     tree->Branch("phoFull5x5_E3x3",          &myphoFull5x5_E3x3_);
+     tree->Branch("phoFull5x5_maxEnergyXtal", &myphoFull5x5_maxEnergyXtal_);
+     tree->Branch("phoFull5x5_R1x5",          &myphoFull5x5_R1x5_);
+     tree->Branch("phoFull5x5_R2x5",          &myphoFull5x5_R2x5_);
+     tree->Branch("phoR1x5",                  &myphoR1x5_);
+     tree->Branch("phoR2x5",                  &myphoR2x5_);
+  }
 }
 
 void ggNtuplizer::fillPhotons(const edm::Event& e, const edm::EventSetup& es) {
@@ -208,6 +240,21 @@ void ggNtuplizer::fillPhotons(const edm::Event& e, const edm::EventSetup& es) {
   phoResol_rho_dn_ .clear();
   phoResol_phi_up_ .clear();
   phoResol_phi_dn_ .clear();  
+  
+  myphoE1x5_.clear();
+  myphoE2_.clear();
+  myphoE2x5_.clear();
+  myphoE3x3_.clear();
+  myphoE5x5_.clear();
+  myphoEmax_.clear();
+  myphoFull5x5_E1x5_.clear();
+  myphoFull5x5_E2x5_.clear();
+  myphoFull5x5_E3x3_.clear();
+  myphoFull5x5_maxEnergyXtal_.clear();
+  myphoFull5x5_R1x5_.clear();
+  myphoFull5x5_R2x5_.clear();
+  myphoR1x5_.clear();
+  myphoR2x5_.clear();
 
   nPho_ = 0;
 
@@ -362,6 +409,24 @@ void ggNtuplizer::fillPhotons(const edm::Event& e, const edm::EventSetup& es) {
     phoMIPNhitCone_    .push_back(iPho->mipNhitCone());
     phoMIPIsHalo_      .push_back(iPho->mipIsHalo());
     */
+    
+    if ( testing() )
+    {
+        myphoE1x5_;                .push_back(iPho->e1x5());
+        myphoE2_;                  .push_back(iPho->e2nd()); // checked pat::photon
+        myphoE2x5_;                .push_back(iPho->e2x5());
+        // myphoE3x3_;                .push_back(iPho->e3x5());
+        myphoE5x5_;                .push_back(iPho->e3x3());
+        myphoEmax_;                .push_back(iPho->eMax()); // checked pat::photon
+        myphoFull5x5_E1x5_;        .push_back(iPho->full5x5_e1x5());
+        myphoFull5x5_E2x5_;        .push_back(iPho->full5x5_e2x5());
+        myphoFull5x5_E3x3_;        .push_back(iPho->full5x5_e3x3());
+        myphoFull5x5_maxEnergyXtal_.push_back(iPho->full5x5_maxEnergyXtal());
+        myphoFull5x5_R1x5_;        .push_back(iPho->full5x5_r1x5());
+        myphoFull5x5_R2x5_;        .push_back(iPho->full5x5_r2x5());
+        myphoR1x5_;                .push_back(iPho->r1x5());
+        myphoR2x5_;                .push_back(iPho->r2x5());
+    }
     
     nPho_++;
   }
