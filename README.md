@@ -17,8 +17,7 @@ rm EgammaAnalysis/ElectronTools/data -rf <br>
 git clone https://github.com/cms-data/EgammaAnalysis-ElectronTools.git EgammaAnalysis/ElectronTools/data <br>
 scram b -j 8 <br>
 git cms-merge-topic cms-met:METFixEE2017_949_v2_backport_to_102X <br>
-git clone https://github.com/cmkuo/HiggsAnalysis.git <br>
-git clone -b 102X https://github.com/cmkuo/ggAnalysis.git <br>
+git clone -b dev https://github.com/ltsai323/ggAnalysis.git <br>
 scram b -j 8 <br>
 
 The above code stores the decision in 64 integer. Each bit represents a decision<br>
