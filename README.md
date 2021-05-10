@@ -2,6 +2,11 @@
 #### Newest tag for testing : 
 #### Note that the current head version can be run with CMSSW_10_2_10
 
+#### SPECIAL NOTES FOR HsinYei
+To test the code, you need to add one line in python script:
+<code>process.ggNtuplizer.testing=cms.bool(True) </code>
+
+
 ##### To work with CMSSW_10_2_10 and head version, you do :
 
 cmsrel CMSSW_10_2_10 <br>	
