@@ -412,20 +412,20 @@ void ggNtuplizer::fillPhotons(const edm::Event& e, const edm::EventSetup& es) {
     
     if ( testing() )
     {
-        myphoE1x5_;                .push_back(iPho->e1x5());
-        myphoE2_;                  .push_back(iPho->e2nd()); // checked pat::photon
-        myphoE2x5_;                .push_back(iPho->e2x5());
-        // myphoE3x3_;                .push_back(iPho->e3x5());
-        myphoE5x5_;                .push_back(iPho->e3x3());
-        myphoEmax_;                .push_back(iPho->eMax()); // checked pat::photon
-        myphoFull5x5_E1x5_;        .push_back(iPho->full5x5_e1x5());
-        myphoFull5x5_E2x5_;        .push_back(iPho->full5x5_e2x5());
-        myphoFull5x5_E3x3_;        .push_back(iPho->full5x5_e3x3());
+        myphoE1x5_                .push_back(iPho->e1x5());
+        myphoE2_                  .push_back(iPho->e2nd()); // checked pat::photon
+        myphoE2x5_                .push_back(iPho->e2x5());
+        // myphoE3x3_                .push_back(iPho->e3x5());
+        myphoE5x5_                .push_back(iPho->e3x3());
+        myphoEmax_                .push_back(iPho->eMax()); // checked pat::photon
+        myphoFull5x5_E1x5_        .push_back(iPho->full5x5_e1x5());
+        myphoFull5x5_E2x5_        .push_back(iPho->full5x5_e2x5());
+        myphoFull5x5_E3x3_        .push_back(iPho->full5x5_e3x3());
         myphoFull5x5_maxEnergyXtal_.push_back(iPho->full5x5_maxEnergyXtal());
-        myphoFull5x5_R1x5_;        .push_back(iPho->full5x5_r1x5());
-        myphoFull5x5_R2x5_;        .push_back(iPho->full5x5_r2x5());
-        myphoR1x5_;                .push_back(iPho->r1x5());
-        myphoR2x5_;                .push_back(iPho->r2x5());
+        myphoFull5x5_R1x5_        .push_back(iPho->full5x5_r1x5());
+        myphoFull5x5_R2x5_        .push_back(iPho->full5x5_r2x5());
+        myphoR1x5_                .push_back(iPho->r1x5());
+        myphoR2x5_                .push_back(iPho->r2x5());
     }
     
     nPho_++;
