@@ -37,6 +37,7 @@ ggNtuplizer::ggNtuplizer(const edm::ParameterSet& ps) :
   vtxLabel_                  = consumes<reco::VertexCollection>        (ps.getParameter<InputTag>("VtxLabel"));
   vtxBSLabel_                = consumes<reco::VertexCollection>        (ps.getParameter<InputTag>("VtxBSLabel"));
   rhoLabel_                  = consumes<double>                        (ps.getParameter<InputTag>("rhoLabel"));
+  rhoAllLabel_               = consumes<double>                        (ps.getParameter<InputTag>("rhoAllLabel"));
   rhoCentralLabel_           = consumes<double>                        (ps.getParameter<InputTag>("rhoCentralLabel"));
   trgEventLabel_             = consumes<trigger::TriggerEvent>         (ps.getParameter<InputTag>("triggerEvent"));
   triggerObjectsLabel_       = consumes<pat::TriggerObjectStandAloneCollection>(ps.getParameter<edm::InputTag>("triggerEvent"));
@@ -57,6 +58,7 @@ ggNtuplizer::ggNtuplizer(const edm::ParameterSet& ps) :
   ecalBadCalibFilterUpdate_  = consumes<bool>                          (ps.getParameter<InputTag>("ecalBadCalibReducedMINIAODFilter"));
 
   photonCollection_          = consumes<View<pat::Photon> >            (ps.getParameter<InputTag>("photonSrc"));
+  ootPhotonCollection_       = consumes<View<pat::Photon> >            (ps.getParameter<InputTag>("ootPhotonSrc"));
   muonCollection_            = consumes<View<pat::Muon> >              (ps.getParameter<InputTag>("muonSrc"));
   ebReducedRecHitCollection_ = consumes<EcalRecHitCollection>          (ps.getParameter<InputTag>("ebReducedRecHitCollection"));
   eeReducedRecHitCollection_ = consumes<EcalRecHitCollection>          (ps.getParameter<InputTag>("eeReducedRecHitCollection"));
@@ -88,7 +90,7 @@ ggNtuplizer::ggNtuplizer(const edm::ParameterSet& ps) :
   cicPhotonId_ = new CiCPhotonID(ps);
 
   Service<TFileService> fs;
-  tree_    = fs->make<TTree>("EventTree", "Event data (tag V10_02_10_05)");
+  tree_    = fs->make<TTree>("EventTree", "Event data (tag V10_02_10_07)");
   hEvents_ = fs->make<TH1F>("hEvents",    "total processed and skimmed events",   2,  0,   2);
 
   branchesGlobalEvent(tree_);
@@ -100,6 +102,7 @@ ggNtuplizer::ggNtuplizer(const edm::ParameterSet& ps) :
   
   branchesMET(tree_);
   branchesPhotons(tree_);
+  if (!doGenParticles_) branchesOOTPhotons(tree_);
   branchesElectrons(tree_);
   branchesMuons(tree_);
   if (dumpPFPhotons_)   branchesPFPhotons(tree_);
@@ -112,6 +115,7 @@ ggNtuplizer::ggNtuplizer(const edm::ParameterSet& ps) :
 
 ggNtuplizer::~ggNtuplizer() {
   cleanupPhotons();
+  cleanupOOTPhotons();
   delete cicPhotonId_;
 }
 
@@ -158,6 +162,7 @@ void ggNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es) {
   fillElectrons(e, es, pv);
   fillMuons(e, pv, vtx);
   fillPhotons(e, es); 
+  if (!doGenParticles_)  fillOOTPhotons(e, es);
   if (dumpPFPhotons_)    fillPFPhotons(e, es);
   if (dumpHFElectrons_ ) fillHFElectrons(e);
   if (dumpTaus_)         fillTaus(e);
