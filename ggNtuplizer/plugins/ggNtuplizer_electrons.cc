@@ -46,6 +46,8 @@ vector<float>  eledEtaAtVtx_;
 vector<float>  eledPhiAtVtx_;
 vector<float>  eleSigmaIEtaIEtaFull5x5_;
 vector<float>  eleSigmaIPhiIPhiFull5x5_;
+vector<float>  eleE2x2Full5x5_;
+vector<float>  eleE5x5Full5x5_;
 vector<int>    eleConvVeto_;
 vector<int>    eleMissHits_;
 vector<float>  eleESEffSigmaRR_;
@@ -142,6 +144,8 @@ void ggNtuplizer::branchesElectrons(TTree* tree) {
   tree->Branch("eledPhiAtVtx",            &eledPhiAtVtx_);
   tree->Branch("eleSigmaIEtaIEtaFull5x5", &eleSigmaIEtaIEtaFull5x5_);
   tree->Branch("eleSigmaIPhiIPhiFull5x5", &eleSigmaIPhiIPhiFull5x5_);
+  tree->Branch("eleE2x2Full5x5",          &eleE2x2Full5x5_);
+  tree->Branch("eleE5x5Full5x5",          &eleE5x5Full5x5_);
   tree->Branch("eleConvVeto",             &eleConvVeto_);
   tree->Branch("eleMissHits",             &eleMissHits_);
   tree->Branch("eleESEffSigmaRR",         &eleESEffSigmaRR_);
@@ -251,6 +255,8 @@ void ggNtuplizer::fillElectrons(const edm::Event &e, const edm::EventSetup &es, 
   eledPhiAtVtx_               .clear();
   eleSigmaIEtaIEtaFull5x5_    .clear();
   eleSigmaIPhiIPhiFull5x5_    .clear();
+  eleE2x2Full5x5_             .clear();
+  eleE5x5Full5x5_             .clear();
   eleConvVeto_                .clear();
   eleMissHits_                .clear();
   eleESEffSigmaRR_            .clear();
@@ -357,6 +363,8 @@ void ggNtuplizer::fillElectrons(const edm::Event &e, const edm::EventSetup &es, 
     eleSigmaIPhiIPhiFull5x5_.push_back(iEle->full5x5_sigmaIphiIphi());
     eleR9Full5x5_           .push_back(iEle->full5x5_r9());
     eleEcalDrivenSeed_      .push_back(iEle->ecalDrivenSeed());
+    eleE2x2Full5x5_         .push_back(lazyToolnoZS.e2x2(*((*iEle).superCluster()->seed())));
+    eleE5x5Full5x5_         .push_back(iEle->full5x5_e5x5());
 
     eleScale_stat_up_.push_back(iEle->userFloat("energyScaleStatUp"));
     eleScale_stat_dn_.push_back(iEle->userFloat("energyScaleStatDown"));
