@@ -55,7 +55,7 @@ ggNtuplizer::ggNtuplizer(const edm::ParameterSet& ps) :
   conversionsCollection_     = consumes<reco::ConversionCollection>    (ps.getParameter<InputTag>("conversionsSrc"));
   beamSpot_                  = consumes<reco::BeamSpot>                (ps.getParameter<edm::InputTag>("beamSpotSrc"));
 
-  ecalBadCalibFilterUpdate_  = consumes<bool>                          (ps.getParameter<InputTag>("ecalBadCalibReducedMINIAODFilter"));
+  BadPFMuonFilterUpdateDz_   = consumes<bool>                          (ps.getParameter<InputTag>("BadPFMuonFilterUpdateDz"));
 
   photonCollection_          = consumes<View<pat::Photon> >            (ps.getParameter<InputTag>("photonSrc"));
   ootPhotonCollection_       = consumes<View<pat::Photon> >            (ps.getParameter<InputTag>("ootPhotonSrc"));
@@ -90,7 +90,7 @@ ggNtuplizer::ggNtuplizer(const edm::ParameterSet& ps) :
   cicPhotonId_ = new CiCPhotonID(ps);
 
   Service<TFileService> fs;
-  tree_    = fs->make<TTree>("EventTree", "Event data (tag V10_02_10_07)");
+  tree_    = fs->make<TTree>("EventTree", "Event data (tag V10_06_20_00)");
   hEvents_ = fs->make<TH1F>("hEvents",    "total processed and skimmed events",   2,  0,   2);
 
   branchesGlobalEvent(tree_);
@@ -148,6 +148,8 @@ void ggNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es) {
       break;
     }
   }
+
+  es.get<CaloTopologyRecord>().get(topology_);
 
   initTriggerFilters(e);
   fillGlobalEvent(e, es);

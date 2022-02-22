@@ -1,6 +1,7 @@
 #include <TString.h>
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "RecoEcal/EgammaCoreTools/interface/EcalClusterLazyTools.h"
+#include "RecoCaloTools/Navigation/interface/CaloRectangle.h"
 #include "ggAnalysis/ggNtuplizer/interface/ggNtuplizer.h"
 
 using namespace std;
@@ -34,10 +35,14 @@ vector<float>  phoE2x2Full5x5_;
 vector<float>  phoE5x5Full5x5_;
 vector<float>  phoR9Full5x5_;
 vector<float>  phoPFChIso_;
+vector<float>  phoPFChPVIso_;
 vector<float>  phoPFPhoIso_;
 vector<float>  phoPFNeuIso_;
 vector<float>  phoPFChWorstIso_;
+vector<float>  phoPFChWorstVetoIso_;
 vector<float>  phoTrkIsoHollowConeDR03_;
+vector<float>  phoEcalPFClusterIso_;
+vector<float>  phoHcalPFClusterIso_;
 //vector<float>  phoSeedBCE_;
 //vector<float>  phoSeedBCEta_;
 vector<float>  phoIDMVA_;
@@ -126,10 +131,14 @@ void ggNtuplizer::branchesPhotons(TTree* tree) {
   //tree->Branch("phoSeedBCE",              &phoSeedBCE_);
   //tree->Branch("phoSeedBCEta",            &phoSeedBCEta_);
   tree->Branch("phoPFChIso",                &phoPFChIso_);
+  tree->Branch("phoPFChPVIso",              &phoPFChPVIso_);
   tree->Branch("phoPFPhoIso",               &phoPFPhoIso_);
   tree->Branch("phoPFNeuIso",               &phoPFNeuIso_);
   tree->Branch("phoPFChWorstIso",           &phoPFChWorstIso_);
+  tree->Branch("phoPFChWorstVetoIso",       &phoPFChWorstVetoIso_);
   tree->Branch("phoTrkIsoHollowConeDR03",   &phoTrkIsoHollowConeDR03_);
+  tree->Branch("phoEcalPFClusterIso",       &phoEcalPFClusterIso_);
+  tree->Branch("phoHcalPFClusterIso",       &phoHcalPFClusterIso_);
   tree->Branch("phoIDMVA",                  &phoIDMVA_);
   tree->Branch("phoFiredSingleTrgs",        &phoFiredSingleTrgs_);
   tree->Branch("phoFiredDoubleTrgs",        &phoFiredDoubleTrgs_);
@@ -208,9 +217,14 @@ void ggNtuplizer::fillPhotons(const edm::Event& e, const edm::EventSetup& es) {
   phoE5x5Full5x5_         .clear();
   phoR9Full5x5_           .clear();
   phoPFChIso_             .clear();
+  phoPFChPVIso_           .clear();
   phoPFPhoIso_            .clear();
   phoPFNeuIso_            .clear();
   phoPFChWorstIso_        .clear();
+  phoPFChWorstVetoIso_    .clear();
+  phoTrkIsoHollowConeDR03_.clear();
+  phoEcalPFClusterIso_    .clear();
+  phoHcalPFClusterIso_    .clear();
   //phoSeedBCE_           .clear();
   //phoSeedBCEta_         .clear();
   phoIDMVA_               .clear();
@@ -298,11 +312,13 @@ void ggNtuplizer::fillPhotons(const edm::Event& e, const edm::EventSetup& es) {
     phoR9_                    .push_back(iPho->r9());
     phoHoverE_                .push_back(iPho->hadTowOverEm());
     phoESEffSigmaRR_          .push_back(lazyTool.eseffsirir(*((*iPho).superCluster())));
-    phoPFChIso_               .push_back(iPho->userFloat("phoChargedIsolation"));
-    phoPFPhoIso_              .push_back(iPho->userFloat("phoPhotonIsolation"));
-    phoPFNeuIso_              .push_back(iPho->userFloat("phoNeutralHadronIsolation"));
-    phoPFChWorstIso_          .push_back(iPho->userFloat("phoWorstChargedIsolation"));
+    phoPFChIso_               .push_back(iPho->chargedHadronIso());
+    phoPFPhoIso_              .push_back(iPho->photonIso());
+    phoPFNeuIso_              .push_back(iPho->neutralHadronIso());
+    phoPFChWorstIso_          .push_back(iPho->chargedHadronWorstVtxIso());
     phoTrkIsoHollowConeDR03_  .push_back(iPho->trkSumPtHollowConeDR03());
+    phoEcalPFClusterIso_      .push_back(iPho->ecalPFClusterIso());
+    phoHcalPFClusterIso_      .push_back(iPho->hcalPFClusterIso());
     phoIDMVA_                 .push_back(iPho->userFloat("PhotonMVAEstimatorRunIIFall17v2Values"));  
 
     // VID decisions     
@@ -350,27 +366,25 @@ void ggNtuplizer::fillPhotons(const edm::Event& e, const edm::EventSetup& es) {
     
     UShort_t tmpxtalbit = 0;
 
-    auto matrix5x5 = lazyTool.matrixDetId(seed,-2,+2,-2,+2);
-    for (auto & deId : matrix5x5 ) {
-      /// cout << "matrix " << deId.rawId() << endl;
-      auto rh = rechits->find(deId);
-      if( rh != rechits->end() ) {
-	nSaturated += rh->checkFlag( EcalRecHit::kSaturated );
-	nLeRecovered += rh->checkFlag( EcalRecHit::kLeadingEdgeRecovered );
-	nNeighRecovered += rh->checkFlag( EcalRecHit::kNeighboursRecovered );
-	nGain1 += rh->checkFlag( EcalRecHit::kHasSwitchToGain1 );
-	nGain6 += rh->checkFlag( EcalRecHit::kHasSwitchToGain6 );
-	nWeired += rh->checkFlag( EcalRecHit::kWeird ) || rh->checkFlag( EcalRecHit::kDiWeird );
-	
-	if( rh->checkFlag( EcalRecHit::kHasSwitchToGain1 ) && rh->checkFlag( EcalRecHit::kSaturated ) && !isSaturated){ //this is to fill only once, i.e. only if xtal has this, no need to check for other xtals
+    auto matrix5x5 = CaloRectangleRange(2, seed, *topology_);
+    for (auto const& deId : matrix5x5 ) {
 
+      auto rh = rechits->find(deId);
+      if (rh != rechits->end()) {
+	nSaturated      += rh->checkFlag( EcalRecHit::kSaturated );
+	nLeRecovered    += rh->checkFlag( EcalRecHit::kLeadingEdgeRecovered );
+	nNeighRecovered += rh->checkFlag( EcalRecHit::kNeighboursRecovered );
+	nGain1          += rh->checkFlag( EcalRecHit::kHasSwitchToGain1 );
+	nGain6          += rh->checkFlag( EcalRecHit::kHasSwitchToGain6 );
+	nWeired         += rh->checkFlag( EcalRecHit::kWeird ) || rh->checkFlag( EcalRecHit::kDiWeird );
+	
+	if (rh->checkFlag( EcalRecHit::kHasSwitchToGain1 ) && rh->checkFlag( EcalRecHit::kSaturated ) && !isSaturated) { 
 	  setbit(tmpxtalbit, 0);
 	  isSaturated = 1;
 	  //break;
 	}
 	
-	if( rh->checkFlag( EcalRecHit::kHasSwitchToGain6 ) && rh->checkFlag( EcalRecHit::kSaturated ) && !isSaturated_gain6){ //this is to fill only once, i.e. only if xtal has this, no need to check for other xtals
-
+	if (rh->checkFlag( EcalRecHit::kHasSwitchToGain6 ) && rh->checkFlag( EcalRecHit::kSaturated ) && !isSaturated_gain6) {
 	  setbit(tmpxtalbit, 1);
 	  isSaturated_gain6 = 1;
 	  //break;
@@ -379,9 +393,8 @@ void ggNtuplizer::fillPhotons(const edm::Event& e, const edm::EventSetup& es) {
       }//if( rh != rechits->end() ) 
        
       if (nWeired>0) setbit(tmpxtalbit,2);      
-      if (nGain6>0) setbit(tmpxtalbit,3); 
-
-    }//for(auto & deId : matrix5x5 )
+      if (nGain6>0)  setbit(tmpxtalbit,3); 
+    }
   
     phoxtalBits_.push_back(tmpxtalbit);
 
@@ -390,14 +403,9 @@ void ggNtuplizer::fillPhotons(const edm::Event& e, const edm::EventSetup& es) {
     phoFiredTripleTrgs_     .push_back(matchTriplePhotonTriggerFilters(iPho->et(), iPho->eta(), iPho->phi()));
     phoFiredL1Trgs_         .push_back(matchL1TriggerFilters(iPho->et(), iPho->eta(), iPho->phi()));
 
-    std::vector<float> vCov = lazyToolnoZS.localCovariances( *((*iPho).superCluster()->seed()) );
-    //const float see = (isnan(vCov[0]) ? 0. : sqrt(vCov[0]));
-    const float spp = (isnan(vCov[2]) ? 0. : sqrt(vCov[2]));
-    const float sep = vCov[1];
-
     phoSigmaIEtaIEtaFull5x5_ .push_back(iPho->full5x5_sigmaIetaIeta());
-    phoSigmaIEtaIPhiFull5x5_ .push_back(sep);
-    phoSigmaIPhiIPhiFull5x5_ .push_back(spp);
+    phoSigmaIEtaIPhiFull5x5_ .push_back(iPho->full5x5_showerShapeVariables().sigmaIetaIphi);
+    phoSigmaIPhiIPhiFull5x5_ .push_back(iPho->full5x5_showerShapeVariables().sigmaIphiIphi);
     phoE2x2Full5x5_          .push_back(lazyToolnoZS.e2x2(*((*iPho).superCluster()->seed())));
     phoE5x5Full5x5_          .push_back(iPho->full5x5_e5x5());
     phoR9Full5x5_            .push_back(iPho->full5x5_r9());
