@@ -25,6 +25,7 @@ Int_t            nPUInfo_;
 vector<int>      nPU_;
 vector<int>      puBX_;
 vector<float>    puTrue_;
+vector<float>    pupthat_max_;
 
 Int_t            nMC_;
 vector<int>      mcPID;
@@ -133,6 +134,7 @@ void ggNtuplizer::branchesGenInfo(TTree* tree, edm::Service<TFileService> &fs) {
   tree->Branch("nPU",           &nPU_);
   tree->Branch("puBX",          &puBX_);
   tree->Branch("puTrue",        &puTrue_);
+  tree->Branch("pupthat_max",   &pupthat_max_);
   tree->Branch("nLHE",          &nLHE_);
   tree->Branch("lhePID",        &lhePID);
   tree->Branch("lhePx",         &lhePx);
@@ -192,6 +194,7 @@ void ggNtuplizer::fillGenInfo(const edm::Event& e) {
   nPU_          .clear();
   puBX_         .clear();
   puTrue_       .clear();
+  pupthat_max_  .clear();
   lhePID        .clear();
   lhePx         .clear();
   lhePy         .clear();
@@ -301,6 +304,11 @@ void ggNtuplizer::fillGenInfo(const edm::Event& e) {
       nPU_   .push_back(pu->getPU_NumInteractions());
       puTrue_.push_back(pu->getTrueNumInteractions());
       puBX_  .push_back(pu->getBunchCrossing());
+      float pthat_max = -99;
+      for ( float pu_pthat : pu->getPU_pT_hats() )
+      { if ( pthat_max < pu_pthat ) pthat_max = pu_pthat; }
+      pupthat_max_.push_back(pthat_max);
+      
 
       nPUInfo_++;
     }
