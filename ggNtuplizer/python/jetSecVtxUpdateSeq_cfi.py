@@ -10,7 +10,7 @@ from  PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cfi import updatedPatJets
 updatedJets = updatedPatJets.clone(
 	addBTagInfo=False,
 	jetSource='slimmedJets',
-	jetCorrFactorsSource=cms.VInputTag(cms.InputTag("jetCorrFactorsNano") ),
+	jetCorrFactorsSource=cms.VInputTag(cms.InputTag("jetCorrFactors") ),
 )
 bJetVars = cms.EDProducer("JetRegressionVarProducer",
     pvsrc = cms.InputTag("offlineSlimmedPrimaryVertices"),
