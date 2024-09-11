@@ -74,25 +74,13 @@ process.cleanedMu = cms.EDProducer("PATMuonCleanerBySegments",
 process.load("ggAnalysis.ggNtuplizer.jetSecVtxUpdateSeq_cfi")
 process.ggNtuplizer.nanoUpdatedUserJetsLabel=cms.InputTag('updatedJetsWithUserData')
 
-### update JEC
-process.load("PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff")
-process.jetCorrFactors = process.updatedPatJetCorrFactors.clone(
-    src = cms.InputTag("slimmedJets"),
-    levels = ['L1FastJet', 'L2Relative', 'L3Absolute'],
-    payload = 'AK4PFchs') 
-
-process.slimmedJetsJEC = process.updatedPatJets.clone(
-    jetSource = cms.InputTag("slimmedJets"),
-    jetCorrFactorsSource = cms.VInputTag(cms.InputTag("jetCorrFactors"))
-    )
-
 process.p = cms.Path(
 #    process.fullPatMetSequenceModifiedMET *
     process.egammaPostRecoSeq *
     process.cleanedMu *
     process.ggMETFiltersSequence *
-    process.jetCorrFactors *
-    process.slimmedJetsJEC *
+#    process.jetCorrFactors *
+#    process.slimmedJetsJEC *
     process.jetSecInfoUpdateSequence*
     process.ggNtuplizer
     )
