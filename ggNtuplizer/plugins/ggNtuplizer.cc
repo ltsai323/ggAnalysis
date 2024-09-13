@@ -210,8 +210,13 @@ int  ggNtuplizer::Year(const edm::Event& evt) const
         printf("MC found: Use input year\n");
         return year_;
     }
-    if ( y != year_ )
+    if ( y != year_ && y!=0 )
         std::cerr << "warning : input year:" << year_ << " is different from calculated year:" << y << ". Use calculated year\n";
+    else
+    {
+        std::cerr << "calculated year is 0 because run number is unknown :" << evt.id().run() << ". Use input year " << year_ << " instead";
+        y = year_;
+    }
     return y;
 }
 
